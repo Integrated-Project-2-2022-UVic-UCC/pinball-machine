@@ -1,0 +1,16 @@
+
+
+#include <Stepper.h>
+Stepper motor1(2048,8,10,9,11); 
+//Pasos complets per donar una volta 2048
+
+
+void setup() {
+  motor1.setSpeed(16);  // rpm (valors de 1,2,3 per el 28BYJ-48)
+  
+}
+
+void loop() {
+  motor1.step(2048);  //realitza una volta sencera
+  //delay(2000);
+}
