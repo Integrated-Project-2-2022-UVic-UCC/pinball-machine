@@ -1,0 +1,143 @@
+
+#include <Stepper.h>
+
+#define OBJECTIU_1 15
+#define OBJECTIU_2 25
+#define OBJECTIU_3 35
+#define OBJECTIU_4 45
+
+int Rele = 7;
+Stepper motor1(2048,8,10,9,11); 
+int SW;
+int compt=0;
+char estat = 'i';
+float posY;
+float posX;
+float valor;
+float valor1;
+float valor2;
+//int Rele = 7;
+float valor3;
+
+void Estat_inicial(int entrada){
+  if ((valor>100)){
+    estat= 'A';
+    Serial.println(" Estat A");
+  }
+}
+
+void Estat_A(int entrada){
+  if ((valor<100)){
+    estat= 'i';
+    Serial.println(" Estat I");
+    compt=compt+1;
+    }
+    
+}
+
+void setup() {
+  Serial.begin(9600);
+  pinMode(Rele, OUTPUT);
+  digitalWrite(Rele, HIGH);
+    // rpm (valors de 1,2,3 per el 28BYJ-48)
+  // Les entrades analògiques no requereixen inicialització  
+ 
+}
+
+
+long t0 = 0;
+int stp = 0;
+void gira(long dt)
+{
+  long t = millis();
+  long tt = t - t0;
+  if(tt>dt)
+  {
+    t0 = t;
+    stp = stp + 1;
+    if(stp>3)
+    {
+      stp=0;
+    }
+    
+    switch(stp)
+    {
+      case 0:
+        digitalWrite(8,HIGH);
+        digitalWrite(9,HIGH);
+        digitalWrite(10,LOW);
+        digitalWrite(11,LOW);
+        break;
+      case 1:
+        digitalWrite(8,LOW);
+        digitalWrite(9,HIGH);
+        digitalWrite(10,HIGH);
+        digitalWrite(11,LOW);
+        break;
+      case 2:
+        digitalWrite(8,LOW);
+        digitalWrite(9,LOW);
+        digitalWrite(10,HIGH);
+        digitalWrite(11,HIGH);
+        break;
+      case 3:
+        digitalWrite(8,HIGH);
+        digitalWrite(9,LOW);
+        digitalWrite(10,LOW);
+        digitalWrite(11,HIGH);
+        break;
+    }
+  }
+  else
+  {
+  }
+  
+}
+
+
+void loop() {
+  
+  posY = analogRead(A0)-511;
+  posX = analogRead(A1)-504;
+  valor1 = pow(posX,2);
+  valor2 = pow(posY,2);
+  valor3= valor1+ valor2;
+  valor= sqrt(valor3);
+  valor = abs(posY) + abs(posX);
+  //Serial.println(valor);
+  Serial.println(compt);
+
+  if (compt>=OBJECTIU_1){
+    gira(15);
+    //motor1.setSpeed(3);
+    //motor1.step(10); 
+  }
+
+  if (compt>=OBJECTIU_2){
+     gira(7);
+     //motor1.setSpeed(6);
+     //motor1.step(10); 
+  }
+
+  if (compt>=OBJECTIU_3){
+     gira(1);
+     //motor1.setSpeed(10);
+     //motor1.step(10); 
+  }
+
+  if (compt>OBJECTIU_4){
+    //digitalWrite(rele,LOW);
+  }
+     
+  switch (estat){
+  case 'i':{
+    Estat_inicial(valor);
+   break;
+  }
+  case 'A':{
+    Estat_A(valor);
+   break;
+  }
+   
+}
+}
